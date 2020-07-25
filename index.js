@@ -10,6 +10,14 @@ client.commands = new Discord.Collection();
 const cooldowns = new Discord.Collection();
 //#endregion
 
+//#region Exports
+module.exports = {
+    getClient: function () {
+        return client;
+    }
+};
+//#endregion
+
 //#region Load commands
 // Initialize command files
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
