@@ -1,0 +1,32 @@
+{
+  "name": "john-madden",
+  "version": "1.0.0",
+  "description": "A Discord bot that plays DECtalk TTS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkl2k2/john-madden.git"
+  },
+  "keywords": [
+    "discord"
+  ],
+  "author": "Joshua L.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jkl2k2/john-madden/issues"
+  },
+  "homepage": "https://github.com/jkl2k2/john-madden#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "bufferutil": "^4.0.1",
+    "discord.js": "^12.2.0",
+    "erlpack": "github:discordapp/erlpack",
+    "ffmpeg-static": "^4.2.6",
+    "libsodium-wrappers": "^0.7.6",
+    "utf-8-validate": "^5.0.2",
+    "zlib-sync": "^0.1.7"
+  }
+}
