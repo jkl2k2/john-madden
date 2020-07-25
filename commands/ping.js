@@ -8,7 +8,6 @@ module.exports = {
     cooldown: 10,
     // guildOnly: false,
     enabled: true,
-    type: 'general',
     async execute(message, args) {
         const m = await message.channel.send(new Discord.MessageEmbed()
             .addField(`:clock3: Message Edit Latency`, `\`Testing...\``)
