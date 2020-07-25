@@ -41,7 +41,9 @@ module.exports = {
                 })
                 .catch(`${console.error}`);
         } else {
-            message.channel.send(`You are not in a voice channel, ${message.author.username}`);
+            message.channel.send(new Discord.MessageEmbed()
+                .setDescription(`<:cross:729019052571492434> You are not in a voice channel`)
+                .setColor(`#FF3838`));
         }
     }
 };
