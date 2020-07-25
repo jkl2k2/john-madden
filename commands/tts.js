@@ -1,9 +1,10 @@
 const http = require(`http`);
 const urlencode = require('urlencode');
+const Discord = require(`discord.js`);
 
 module.exports = {
     name: 'tts',
-    description: 'Plays Moonbase Alpha/Steve Hawking text-to-speech in your voice channel',
+    description: 'Plays Moonbase Alpha text-to-speech in your voice channel',
     aliases: ['say', 't'],
     args: true,
     usage: '[text to say]',
@@ -15,10 +16,15 @@ module.exports = {
         id: [],
     },
     execute(message, args) {
+        if (urlencode.encode(args.join(" ")).length > 1024) {
+            return message.channel.send(new Discord.MessageEmbed()
+                .setDescription(`<:cross:729019052571492434> Sorry, the character limit is 1024`)
+                .setColor(`#FF3838`));
+        }
+
         if (message.member.voice.channel) {
             message.member.voice.channel.join()
                 .then(connection => {
-
                     let options = {
                         host: `tts.cyzon.us`,
                         path: `/tts?text=${urlencode.encode(args.join(" "))}`
