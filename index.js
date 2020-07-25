@@ -1,5 +1,5 @@
 //#region Requires
-const { TOKEN } = require(`./config/config.json`);
+const { TOKEN, OWNER_ID } = require(`./config/config.json`);
 const Discord = require(`discord.js`);
 const fs = require(`fs`);
 //#endregion
@@ -11,7 +11,6 @@ const cooldowns = new Discord.Collection();
 //#endregion
 
 //#region Load commands
-
 // Initialize command files
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -19,12 +18,12 @@ for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.name, command);
 }
-
 //#endregion
 
 //#region Client ready
 client.once(`ready`, () => {
     console.log(`Bot initialized: active in ${client.guilds.cache.size} servers`);
+    client.user.setActivity({ type: `PLAYING`, name: `Moonbase Alpha` });
 });
 //#endregion
 
@@ -79,48 +78,83 @@ client.on(`message`, message => {
 
     if (!message.content.startsWith(prefix)) return;
 
+    // Put args into array
+    const args = message.content.slice(prefix.length).split(/ +/);
+    const argsShifted = [...args];
+    argsShifted.shift();
+
     const commandName = args.shift().toLowerCase();
 
     const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
     if (!command) return;
 
+    // If guild-only, no DMs allowed
     if (command.guildOnly && message.channel.type !== 'text') {
         return message.channel.send(new Discord.MessageEmbed()
             .setDescription(`<:cross:729019052571492434> Sorry, that command is only usable in servers`)
             .setColor(`#FF3838`));
     }
 
+    // If command needs arguments
     if (command.args && !args.length) {
-        let reply = `You didn't provide any arguments, ${message.author}!`;
+        let noArgs = new Discord.MessageEmbed();
+        let msg = `You didn't use \`${prefix}${command.name}\` correctly, ${message.author.username}`;
 
         if (command.usage) {
-            reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+            msg += `\n\nThe proper usage would be:\n\`${prefix}${command.name} ${command.usage}\``;
         }
 
-        return message.channel.send(reply);
+        noArgs.setDescription(msg);
+        noArgs.setAuthor(`Improper usage`, client.user.avatarURL());
+
+        return message.channel.send(noArgs);
     }
 
+    // If command has cooldowns
     if (!cooldowns.has(command.name)) {
         cooldowns.set(command.name, new Discord.Collection());
     }
 
+    // Set times for use with cooldown
     const now = Date.now();
     const timestamps = cooldowns.get(command.name);
     const cooldownAmount = (command.cooldown || 3) * 1000;
 
+    // Act on cooldown
     if (timestamps.has(message.author.id)) {
         const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
-        if (now < expirationTime) {
+        if (now < expirationTime && message.author.id != OWNER_ID) {
             const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+            logger.debug(`${chalk.black.bgWhite(`${message.author.username} -> `)}${chalk.black.bgWhiteBright(`!${commandName}`)}${chalk.black.bgWhite(` ` + argsShifted.join(` `))}${chalk.whiteBright.bgRedBright(`Cooldown in effect`)}`);
+            let cooldownEmbed = new Discord.MessageEmbed()
+                .addField(`<:cross:729019052571492434> Command cooldown`, `Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command`)
+                .setColor(`#FF3838`);
+            return message.channel.send(cooldownEmbed);
         }
     }
 
     timestamps.set(message.author.id, now);
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
+    // If command has permission restrictions
+    if (command.restrictions && message.member.id != OWNER_ID) {
+        if (command.restrictions.resolvable && command.restrictions.resolvable.length > 0 && !message.member.hasPermission(command.restrictions.resolvable)) {
+            return message.channel.send(new Discord.MessageEmbed()
+                .setDescription(`<:cross:729019052571492434> Sorry, ${message.author.username}, you do not have the required permission(s) to use \`${prefix}${command.name}\`\n\nPermissions required:\n\`${command.restrictions.resolvable.join("\n")}\``)
+                .setColor(`#FF3838`));
+        } else if (command.restrictions.id && command.restrictions.id.length > 0) {
+            const match = (element) => element == message.author.id;
+            if (!command.restrictions.id.some(match)) {
+                return message.channel.send(new Discord.MessageEmbed()
+                    .setDescription(`<:cross:729019052571492434> Sorry, ${message.author.username}, only certain users can use \`${prefix}${command.name}\``)
+                    .setColor(`#FF3838`));
+            }
+        }
+    }
+
+    // Attempt to execute command
     try {
         command.execute(message, args);
     } catch (error) {
