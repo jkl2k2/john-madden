@@ -25,9 +25,9 @@ module.exports = {
 
             generalHelp.setAuthor(`Use ${prefix}help [command name] to get info on a specific command`, client.user.avatarURL());
 
-            generalHelp.addField(`Voice`, `tts\njoin\nleave`);
-            generalHelp.addField(`General`, `help\nping`);
-            generalHelp.addField(`Admin`, `prefix`);
+            generalHelp.addField(`Voice`, `tts\njoin\nleave`, true);
+            generalHelp.addField(`General`, `help\nping`, true);
+            generalHelp.addField(`Admin`, `prefix`, true);
 
             return message.channel.send(generalHelp);
         }
