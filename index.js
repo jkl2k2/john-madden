@@ -54,7 +54,7 @@ client.on(`message`, message => {
 
         // Write to serverConfig.json
         fs.writeFile(`./config/serverConfig.json`, JSON.stringify(serverConfig, null, `\t`), err => {
-            if (err) logger.error(err);
+            if (err) console.error(err);
         });
     }
 
@@ -70,7 +70,7 @@ client.on(`message`, message => {
 
         // Write to serverConfig.json
         fs.writeFile(`./config/serverConfig.json`, JSON.stringify(serverConfig, null, `\t`), err => {
-            if (err) logger.error(err);
+            if (err) console.error(err);
         });
     }
 
@@ -135,7 +135,6 @@ client.on(`message`, message => {
 
         if (now < expirationTime && message.author.id != OWNER_ID) {
             const timeLeft = (expirationTime - now) / 1000;
-            logger.debug(`${chalk.black.bgWhite(`${message.author.username} -> `)}${chalk.black.bgWhiteBright(`!${commandName}`)}${chalk.black.bgWhite(` ` + argsShifted.join(` `))}${chalk.whiteBright.bgRedBright(`Cooldown in effect`)}`);
             let cooldownEmbed = new Discord.MessageEmbed()
                 .addField(`<:cross:729019052571492434> Command cooldown`, `Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command`)
                 .setColor(`#FF3838`);
