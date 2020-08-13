@@ -47,12 +47,6 @@ module.exports = {
                 })
                 .catch(`${console.error}`);
         } else {
-            /*
-            message.channel.send(new Discord.MessageEmbed()
-                .setDescription(`<:cross:729019052571492434> You are not in a voice channel`)
-                .setColor(`#FF3838`));
-            */
-
             let options = {
                 host: `tts.cyzon.us`,
                 path: `/tts?text=${urlencode.encode(args.join(" "))}`
