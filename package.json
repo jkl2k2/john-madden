@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/jkl2k2/john-madden#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.3.3",
+    "@discordjs/opus": "^0.8.0",
     "bufferutil": "^4.0.1",
     "discord.js": "^12.2.0",
     "erlpack": "github:discordapp/erlpack",
